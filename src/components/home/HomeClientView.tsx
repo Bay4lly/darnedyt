@@ -11,7 +11,6 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
-  Flame,
   Globe2,
   ShieldCheck,
   Sparkles,
@@ -35,42 +34,37 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
   const [openFaqId, setOpenFaqId] = useState<string | null>(faqs[0]?.id || null);
 
   const subCountFormatted = formatCompactNumber(parseInt(subs || '385000'));
-  const viewCountFormatted = formatCompactNumber(parseInt(views || '142000000'));
 
-  // Embedded Shorts without view counts
+  // Exact DarNed YouTube Shorts from user provided links
   const defaultShorts = [
     {
       id: 'short-1',
-      videoId: 'pL6qYFh-xX4',
-      title: 'Minecraft But You Only Have 1 Heart Level 999 Challenge!',
+      videoId: 'XkOo3DhOv38',
+      url: 'https://www.youtube.com/shorts/XkOo3DhOv38',
     },
     {
       id: 'short-2',
-      videoId: 'Z9Y0w0c4e4M',
-      title: 'Can You Escape The Ultimate Custom Warden Trap in 30 Seconds?',
+      videoId: 'FeyfzeGnPzg',
+      url: 'https://www.youtube.com/shorts/FeyfzeGnPzg',
     },
     {
       id: 'short-3',
-      videoId: 'kJQP7kiw5Fk',
-      title: 'Secret Minecraft Bedrock Glitch That Lets You Fly Without Elytra!',
+      videoId: 'KF8oj78vXso',
+      url: 'https://www.youtube.com/shorts/KF8oj78vXso',
     },
   ];
 
-  // Embedded Videos without view counts
+  // Exact DarNed YouTube Long Videos from user provided links
   const defaultLongVideos = [
     {
       id: 'video-1',
-      videoId: 'L_LUpnjgPso',
-      title: 'Surviving Minecraft 100 Days on an Impossible Custom Modpack',
-      duration: '18:42',
-      desc: 'Specialized gameplay challenge showcasing custom items and high-energy commentary.',
+      videoId: 'XquuW9266M8',
+      url: 'https://www.youtube.com/watch?v=XquuW9266M8',
     },
     {
       id: 'video-2',
-      videoId: 'fJ9rUzIMcZQ',
-      title: 'Testing 50 VIRAL Minecraft Hacks to See If They ACTUALLY Work!',
-      duration: '14:15',
-      desc: 'Testing community mythbusters and viral server mechanics with guest creators.',
+      videoId: 'qfAgc_vzxlY',
+      url: 'https://www.youtube.com/watch?v=qfAgc_vzxlY',
     },
   ];
 
@@ -149,12 +143,12 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
 
           </div>
 
-          {/* Stats Bar (3 clean metrics) */}
+          {/* Stats Bar */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
-            className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto"
+            className="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto"
           >
             <div className="bg-card border border-card-border rounded-2xl p-6 backdrop-blur-xl shadow-xl flex flex-col items-center text-center space-y-1 hover:border-brand-purple/50 transition-all group">
               <div className="p-3 rounded-xl bg-purple-500/10 text-brand-purple mb-2 group-hover:scale-110 transition-transform">
@@ -162,14 +156,6 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
               </div>
               <span className="font-display text-3xl font-black text-white">{subCountFormatted}+</span>
               <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">{t.hero.subscribers}</span>
-            </div>
-
-            <div className="bg-card border border-card-border rounded-2xl p-6 backdrop-blur-xl shadow-xl flex flex-col items-center text-center space-y-1 hover:border-brand-pink/50 transition-all group">
-              <div className="p-3 rounded-xl bg-pink-500/10 text-brand-pink mb-2 group-hover:scale-110 transition-transform">
-                <Flame className="w-6 h-6" />
-              </div>
-              <span className="font-display text-3xl font-black text-white">{viewCountFormatted}+</span>
-              <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">{t.hero.totalViews}</span>
             </div>
 
             <div className="bg-card border border-card-border rounded-2xl p-6 backdrop-blur-xl shadow-xl flex flex-col items-center text-center space-y-1 hover:border-indigo-500/50 transition-all group">
@@ -208,8 +194,8 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
             </h2>
             <p className="text-sm leading-relaxed text-gray-300">
               {lang === 'tr'
-                ? 'DarNed, Amerika Birleşik Devletleri merkezli önde gelen bir Minecraft içerik üreticisidir. Hızlı tempolu oyun videoları, özel mod incelemeleri, meydan okumalar ve viral YouTube Shorts içerikleriyle tanınır. 385.000 abonesi ve 140 milyon izlenmesiyle oyuncu kitlesine doğrudan ulaşır.'
-                : 'DarNed is a top-tier Minecraft content creator based in the United States, renowned for fast-paced gameplay challenges, custom mod showcases, and viral YouTube Shorts. With over 385,000 subscribers and 142M+ total views, DarNed provides authentic brand reach to gaming enthusiasts.'}
+                ? 'DarNed, Amerika Birleşik Devletleri merkezli önde gelen bir Minecraft içerik üreticisidir. Hızlı tempolu oyun videoları, özel mod incelemeleri, meydan okumalar ve viral YouTube Shorts içerikleriyle tanınır. 385.000 abonesiyle oyuncu kitlesine doğrudan ulaşır.'
+                : 'DarNed is a top-tier Minecraft content creator based in the United States, renowned for fast-paced gameplay challenges, custom mod showcases, and viral YouTube Shorts. With over 385,000 subscribers, DarNed provides authentic brand reach to gaming enthusiasts.'}
             </p>
             <div className="flex flex-wrap gap-4 pt-2">
               <Link href="/about" className="text-xs font-bold text-brand-cyan hover:underline inline-flex items-center gap-1">
@@ -221,7 +207,7 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
       </section>
 
-      {/* 3. FEATURED SHORTS SECTION WITH EMBEDDED IFRAME PLAYER */}
+      {/* 3. FEATURED SHORTS SECTION WITH EXACT YOUTUBE EMBEDDED PLAYER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
@@ -245,36 +231,32 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {shortsToDisplay.map((short: any) => {
-            const vId = short.videoId || short.id || 'pL6qYFh-xX4';
+            const vId = short.videoId || short.id;
             return (
               <div
                 key={short.id}
                 className="group relative rounded-2xl overflow-hidden border border-white/10 bg-card hover:border-brand-pink/50 transition-all duration-300 shadow-xl flex flex-col"
               >
+                {/* Embedded Real YouTube Player (Title provided natively by YouTube player) */}
                 <div className="w-full aspect-[9/14] bg-black relative">
                   <iframe
-                    src={`https://www.youtube.com/embed/${vId}?rel=0&modestbranding=1`}
-                    title={short.title}
+                    src={`https://www.youtube-nocookie.com/embed/${vId}?rel=0&modestbranding=1`}
+                    title="YouTube Short"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full border-0"
                   />
                 </div>
-                <div className="p-4 space-y-2 bg-[#0c0c14]">
-                  <h3 className="text-xs font-bold text-white line-clamp-2">
-                    {short.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-[11px] text-gray-400 font-mono">
-                    <span>@DarNedYt</span>
-                    <a
-                      href={short.url || `https://www.youtube.com/shorts/${vId}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-pink font-semibold hover:underline inline-flex items-center gap-1"
-                    >
-                      YouTube <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
+                <div className="p-3 bg-[#0c0c14] flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                  <span>@DarNedYt</span>
+                  <a
+                    href={short.url || `https://www.youtube.com/shorts/${vId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-pink font-semibold hover:underline inline-flex items-center gap-1"
+                  >
+                    YouTube <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               </div>
             );
@@ -282,7 +264,7 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
       </section>
 
-      {/* 4. FEATURED LONG-FORM VIDEOS SECTION WITH EMBEDDED IFRAME PLAYER */}
+      {/* 4. FEATURED LONG-FORM VIDEOS SECTION WITH EXACT YOUTUBE EMBEDDED PLAYER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
@@ -298,39 +280,32 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {videosToDisplay.map((video: any) => {
-            const vId = video.videoId || video.id || 'L_LUpnjgPso';
+            const vId = video.videoId || video.id;
             return (
               <div
                 key={video.id}
                 className="group rounded-2xl border border-white/10 bg-card overflow-hidden hover:border-brand-purple/50 transition-all shadow-xl flex flex-col"
               >
+                {/* Embedded Real YouTube Player (Title provided natively by YouTube player) */}
                 <div className="relative aspect-video bg-black">
                   <iframe
-                    src={`https://www.youtube.com/embed/${vId}?rel=0&modestbranding=1`}
-                    title={video.title}
+                    src={`https://www.youtube-nocookie.com/embed/${vId}?rel=0&modestbranding=1`}
+                    title="YouTube Video"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full border-0"
                   />
                 </div>
-                <div className="p-6 space-y-3 bg-[#0c0c14] flex-grow">
-                  <h3 className="text-base font-bold text-white">
-                    {video.title}
-                  </h3>
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    {video.desc || 'Full dedicated Minecraft gameplay video showcasing sponsor branding and custom integration.'}
-                  </p>
-                  <div className="flex items-center justify-between text-xs font-mono text-gray-500 pt-2 border-t border-white/5">
-                    <span>@DarNedYt Official</span>
-                    <a
-                      href={video.url || `https://www.youtube.com/watch?v=${vId}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-cyan font-semibold inline-flex items-center gap-1 hover:underline"
-                    >
-                      Watch on YouTube <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
+                <div className="p-4 bg-[#0c0c14] flex items-center justify-between text-xs font-mono text-gray-400">
+                  <span>@DarNedYt Official</span>
+                  <a
+                    href={video.url || `https://www.youtube.com/watch?v=${vId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-brand-cyan font-semibold inline-flex items-center gap-1 hover:underline"
+                  >
+                    Watch on YouTube <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               </div>
             );
