@@ -1,4 +1,3 @@
-'use me';
 'use server';
 
 import { db } from '@/lib/db';
@@ -83,8 +82,8 @@ export async function createTicketAction(formData: any) {
 
     await createAuditLog(user?.userId || null, 'TICKET_CREATED', `Ticket ${ticketNumber} created by ${email}`);
 
-    await sendTicketConfirmationEmail(email, name, ticketNumber, subject);
-    await sendAdminNewTicketAlert(ticketNumber, name, email, subject, category);
+    sendTicketConfirmationEmail(email, name, ticketNumber, subject).catch((e) => console.warn('Email notice:', e));
+    sendAdminNewTicketAlert(ticketNumber, name, email, subject, category).catch((e) => console.warn('Admin alert notice:', e));
 
     return { success: true, ticketNumber };
   } catch (error: any) {
@@ -143,7 +142,7 @@ export async function addTicketMessageAction(formData: any) {
     });
 
     if (isAdmin && sendEmailCopy) {
-      await sendTicketReplyNotification(ticket.email, ticket.name, ticket.ticketNumber, sanitizedMessage);
+      sendTicketReplyNotification(ticket.email, ticket.name, ticket.ticketNumber, sanitizedMessage).catch((e) => console.warn('Reply email notice:', e));
     }
 
     await createAuditLog(user?.userId || null, 'TICKET_REPLY_ADDED', `Reply added to ${ticket.ticketNumber} by ${user?.email}`);

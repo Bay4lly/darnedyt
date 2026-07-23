@@ -1,4 +1,3 @@
-'use me';
 'use server';
 
 import bcrypt from 'bcryptjs';
@@ -59,12 +58,14 @@ export async function registerAction(formData: any) {
     });
 
     await setSessionCookie(token, false);
-    await sendWelcomeEmail(user.email, user.name);
+
+    // Asynchronous email dispatch in background so registration response never blocks
+    sendWelcomeEmail(user.email, user.name).catch((err) => console.warn('Welcome email notice:', err));
 
     return { success: true, role: user.role };
   } catch (error: any) {
     console.error('Register action error:', error);
-    return { success: false, error: 'An unexpected error occurred during registration.' };
+    return { success: false, error: error?.message || 'An unexpected error occurred during registration.' };
   }
 }
 
@@ -152,7 +153,7 @@ export async function forgotPasswordAction(formData: any) {
       },
     });
 
-    await sendPasswordResetEmail(email, resetTokenStr);
+    sendPasswordResetEmail(email, resetTokenStr).catch((err) => console.warn('Reset email notice:', err));
     await createAuditLog(user.id, 'FORGOT_PASSWORD_REQUESTED', `Password reset token generated for ${email}`);
 
     return { success: true, message: 'If an account exists for this email, a password reset link has been sent.' };

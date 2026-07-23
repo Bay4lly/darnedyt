@@ -1,4 +1,3 @@
-'use me';
 'use server';
 
 import { db } from '@/lib/db';
