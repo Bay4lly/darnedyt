@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String         @id @default(cuid())
+  name            String
+  username        String         @unique
+  email           String         @unique
+  passwordHash    String
+  company         String?
+  role            String         @default("USER") // USER | STAFF | ADMIN | SUPER_ADMIN
+  isEmailVerified Boolean        @default(false)
+  isBanned        Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+  tickets         Ticket[]       @relation("UserTickets")
+  assignedTickets Ticket[]       @relation("AssignedAdminTickets")
+  messages        TicketMessage[]
+  adminNotes      AdminNote[]    @relation("AuthorAdminNotes")
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  createdAt    DateTime @default(now())
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id              String         @id @default(cuid())
+  ticketNumber    String         @unique
+  userId          String?
+  user            User?          @relation("UserTickets", fields: [userId], references: [id], onDelete: SetNull)
+  name            String
+  company         String?
+  email           String
+  phone           String?
+  category        String         @default("BUSINESS") // SPONSORSHIP | BUSINESS | COLLABORATION | SUPPORT | COPYRIGHT | OTHER
+  subject         String
+  message         String
+  estimatedBudget String?
+  startDate       String?
+  contentType     String?
+  status          String         @default("OPEN") // OPEN | PENDING | IN_PROGRESS | ANSWERED | CLOSED | SPAM
+  priority        String         @default("NORMAL") // LOW | NORMAL | HIGH | URGENT
+  assignedToId    String?
+  assignedTo      User?          @relation("AssignedAdminTickets", fields: [assignedToId], references: [id], onDelete: SetNull)
+  isDeleted       Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  messages        TicketMessage[]
+  attachments     TicketAttachment[]
+  adminNotes      AdminNote[]
+}
+
+model TicketMessage {
+  id          String             @id @default(cuid())
+  ticketId    String
+  ticket      Ticket             @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId    String?
+  sender      User?              @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  senderName  String
+  senderEmail String
+  isFromAdmin Boolean            @default(false)
+  message     String
+  createdAt   DateTime           @default(now())
+  attachments TicketAttachment[]
+}
+
+model TicketAttachment {
+  id        String         @id @default(cuid())
+  ticketId  String
+  ticket    Ticket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  messageId String?
+  message   TicketMessage? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileName  String
+  fileUrl   String
+  fileSize  Int
+  fileType  String
+  createdAt DateTime       @default(now())
+}
+
+model AdminNote {
+  id        String   @id @default(cuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation("AuthorAdminNotes", fields: [authorId], references: [id], onDelete: Cascade)
+  note      String
+  createdAt DateTime @default(now())
+}
+
+model SponsorshipPackage {
+  id         String   @id @default(cuid())
+  titleEn    String
+  titleTr    String
+  descEn     String
+  descTr     String
+  price      String
+  showPrice  Boolean  @default(true)
+  featuresEn String
+  featuresTr String
+  isPopular  Boolean  @default(false)
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FAQ {
+  id         String   @id @default(cuid())
+  questionEn String
+  questionTr String
+  answerEn   String
+  answerTr   String
+  category   String   @default("General")
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  recipient String
+  subject   String
+  body      String
+  status    String
+  error     String?
+  ticketId  String?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  details   String
+  ipAddress String?
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <defs>
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#07070a" />
+      <stop offset="35%" stop-color="#150d2a" />
+      <stop offset="70%" stop-color="#0d1b2a" />
+      <stop offset="100%" stop-color="#07070a" />
+    </linearGradient>
+    <linearGradient id="neonText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <filter id="glowBanner" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="400" fill="url(#bannerBg)" />
+  
+  <!-- Grid overlay -->
+  <g opacity="0.1" stroke="#ffffff" stroke-width="1">
+    <path d="M0,50 H1200 M0,100 H1200 M0,150 H1200 M0,200 H1200 M0,250 H1200 M0,300 H1200 M0,350 H1200" />
+    <path d="M100,0 V400 M200,0 V400 M300,0 V400 M400,0 V400 M500,0 V400 M600,0 V400 M700,0 V400 M800,0 V400 M900,0 V400 M1000,0 V400 M1100,0 V400" />
+  </g>
+
+  <!-- Dynamic Blobs -->
+  <circle cx="200" cy="100" r="180" fill="#7c3aed" opacity="0.15" filter="url(#glowBanner)" />
+  <circle cx="1000" cy="300" r="220" fill="#06b6d4" opacity="0.15" filter="url(#glowBanner)" />
+
+  <!-- Center Content -->
+  <g text-anchor="middle">
+    <text x="600" y="190" font-family="'Outfit', sans-serif" font-weight="900" font-size="76" fill="url(#neonText)" letter-spacing="8" filter="url(#glowBanner)">
+      DARned
+    </text>
+    <text x="600" y="250" font-family="'Inter', sans-serif" font-weight="700" font-size="28" fill="#e2e8f0" letter-spacing="4">
+      MINECRAFT & SHORTS CREATOR
+    </text>
+    <text x="600" y="295" font-family="'Inter', sans-serif" font-weight="500" font-size="20" fill="#94a3b8" letter-spacing="2">
+      385,000+ SUBSCRIBERS • SPONSORSHIP HUB
+    </text>
+  </g>
+</svg>
