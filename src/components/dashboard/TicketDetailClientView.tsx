@@ -25,17 +25,23 @@ interface TicketDetailClientProps {
   ticket: any;
 }
 
-export function TicketDetailClientView({ userSession, ticket }: TicketDetailClientProps) {
+export function TicketDetailClientView({ userSession, ticket: initialTicket }: TicketDetailClientProps) {
   const router = useRouter();
+  const [ticket, setTicket] = useState(initialTicket);
   const [replyMessage, setReplyMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
 
-  // Automatic Live Polling for new ticket replies every 6 seconds
+  // Sync ticket when server revalidates props
+  useEffect(() => {
+    setTicket(initialTicket);
+  }, [initialTicket]);
+
+  // Automatic Live Polling for new ticket replies every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       router.refresh();
-    }, 6000);
+    }, 4000);
     return () => clearInterval(interval);
   }, [router]);
 
@@ -43,19 +49,36 @@ export function TicketDetailClientView({ userSession, ticket }: TicketDetailClie
     e.preventDefault();
     if (!replyMessage.trim()) return;
 
+    const messageText = replyMessage;
     setIsSubmitting(true);
     setToast(null);
 
+    // Optimistic UI update: Render own message instantly in 0ms!
+    const optimisticMsg = {
+      id: 'opt-' + Date.now(),
+      senderName: userSession?.name || ticket.name,
+      senderEmail: userSession?.email || ticket.email,
+      isFromAdmin: false,
+      message: messageText,
+      createdAt: new Date().toISOString(),
+    };
+
+    setTicket((prev: any) => ({
+      ...prev,
+      messages: [...(prev.messages || []), optimisticMsg],
+    }));
+
+    setReplyMessage('');
+
     const res = await addTicketMessageAction({
       ticketId: ticket.id,
-      message: replyMessage,
+      message: messageText,
       sendEmailCopy: true,
     });
 
     setIsSubmitting(false);
 
     if (res.success) {
-      setReplyMessage('');
       setToast({ type: 'success', message: 'Reply sent successfully!' });
       router.refresh();
     } else {
@@ -82,7 +105,7 @@ export function TicketDetailClientView({ userSession, ticket }: TicketDetailClie
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
         <div className="inline-flex items-center gap-1.5 text-[11px] font-mono text-gray-400">
-          <RefreshCw className="w-3 h-3 text-brand-cyan animate-spin" /> Live Updates Active
+          <RefreshCw className="w-3 h-3 text-brand-cyan animate-spin" /> Live Updates (4s)
         </div>
       </div>
 
