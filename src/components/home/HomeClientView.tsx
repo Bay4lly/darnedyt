@@ -12,6 +12,7 @@ import {
   ChevronUp,
   ExternalLink,
   Globe2,
+  Play,
   ShieldCheck,
   Sparkles,
   Trophy,
@@ -40,17 +41,17 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
     {
       id: 'short-1',
       videoId: 'XkOo3DhOv38',
-      url: 'https://www.youtube.com/shorts/XkOo3DhOv38',
+      directUrl: 'https://www.youtube.com/shorts/XkOo3DhOv38',
     },
     {
       id: 'short-2',
       videoId: 'FeyfzeGnPzg',
-      url: 'https://www.youtube.com/shorts/FeyfzeGnPzg',
+      directUrl: 'https://www.youtube.com/shorts/FeyfzeGnPzg',
     },
     {
       id: 'short-3',
       videoId: 'KF8oj78vXso',
-      url: 'https://www.youtube.com/shorts/KF8oj78vXso',
+      directUrl: 'https://www.youtube.com/shorts/KF8oj78vXso',
     },
   ];
 
@@ -59,12 +60,12 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
     {
       id: 'video-1',
       videoId: 'XquuW9266M8',
-      url: 'https://www.youtube.com/watch?v=XquuW9266M8',
+      directUrl: 'https://www.youtube.com/watch?v=XquuW9266M8',
     },
     {
       id: 'video-2',
       videoId: 'qfAgc_vzxlY',
-      url: 'https://www.youtube.com/watch?v=qfAgc_vzxlY',
+      directUrl: 'https://www.youtube.com/watch?v=qfAgc_vzxlY',
     },
   ];
 
@@ -207,7 +208,7 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
       </section>
 
-      {/* 3. FEATURED SHORTS SECTION WITH EXACT YOUTUBE EMBEDDED PLAYER */}
+      {/* 3. FEATURED SHORTS SECTION WITH DIRECT INDIVIDUAL LINKS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
@@ -232,30 +233,33 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {shortsToDisplay.map((short: any) => {
             const vId = short.videoId || short.id;
+            const directUrl = short.directUrl || `https://www.youtube.com/shorts/${vId}`;
+
             return (
               <div
                 key={short.id}
                 className="group relative rounded-2xl overflow-hidden border border-white/10 bg-card hover:border-brand-pink/50 transition-all duration-300 shadow-xl flex flex-col"
               >
-                {/* Embedded Real YouTube Player (Title provided natively by YouTube player) */}
-                <div className="w-full aspect-[9/14] bg-black relative">
+                {/* Responsive Embedded YouTube Player */}
+                <div className="w-full aspect-[9/16] bg-black relative">
                   <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${vId}?rel=0&modestbranding=1`}
+                    src={`https://www.youtube.com/embed/${vId}`}
                     title="YouTube Short"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     className="w-full h-full border-0"
                   />
                 </div>
-                <div className="p-3 bg-[#0c0c14] flex items-center justify-between text-[11px] text-gray-400 font-mono">
-                  <span>@DarNedYt</span>
+                <div className="p-3 bg-[#0c0c14] flex items-center justify-between text-xs font-mono text-gray-300">
+                  <span className="font-bold text-white">@DarNedYt</span>
                   <a
-                    href={short.url || `https://www.youtube.com/shorts/${vId}`}
+                    href={directUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-brand-pink font-semibold hover:underline inline-flex items-center gap-1"
+                    className="px-3 py-1 rounded-lg bg-brand-pink/20 text-brand-pink border border-brand-pink/40 hover:bg-brand-pink/30 font-bold transition-all inline-flex items-center gap-1.5"
                   >
-                    YouTube <ExternalLink className="w-3 h-3" />
+                    <span>Watch Short</span>
+                    <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
               </div>
@@ -264,7 +268,7 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
       </section>
 
-      {/* 4. FEATURED LONG-FORM VIDEOS SECTION WITH EXACT YOUTUBE EMBEDDED PLAYER */}
+      {/* 4. FEATURED LONG-FORM VIDEOS SECTION WITH DIRECT INDIVIDUAL LINKS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
@@ -281,30 +285,33 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {videosToDisplay.map((video: any) => {
             const vId = video.videoId || video.id;
+            const directUrl = video.directUrl || `https://www.youtube.com/watch?v=${vId}`;
+
             return (
               <div
                 key={video.id}
                 className="group rounded-2xl border border-white/10 bg-card overflow-hidden hover:border-brand-purple/50 transition-all shadow-xl flex flex-col"
               >
-                {/* Embedded Real YouTube Player (Title provided natively by YouTube player) */}
+                {/* Responsive Embedded YouTube Player */}
                 <div className="relative aspect-video bg-black">
                   <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${vId}?rel=0&modestbranding=1`}
+                    src={`https://www.youtube.com/embed/${vId}`}
                     title="YouTube Video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     className="w-full h-full border-0"
                   />
                 </div>
-                <div className="p-4 bg-[#0c0c14] flex items-center justify-between text-xs font-mono text-gray-400">
-                  <span>@DarNedYt Official</span>
+                <div className="p-4 bg-[#0c0c14] flex items-center justify-between text-xs font-mono text-gray-300">
+                  <span className="font-bold text-white">@DarNedYt Official</span>
                   <a
-                    href={video.url || `https://www.youtube.com/watch?v=${vId}`}
+                    href={directUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-brand-cyan font-semibold inline-flex items-center gap-1 hover:underline"
+                    className="px-3.5 py-1.5 rounded-lg bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/40 hover:bg-brand-cyan/30 font-bold transition-all inline-flex items-center gap-1.5"
                   >
-                    Watch on YouTube <ExternalLink className="w-3 h-3" />
+                    <span>Watch Video</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
