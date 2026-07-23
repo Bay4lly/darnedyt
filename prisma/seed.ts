@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting DarNed Sponsorship Hub database seeding...');
 
-  const adminEmail = process.env.ADMIN_EMAIL || 'umran3639828@gmail.com';
-  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || 'AdminUmran1234!';
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
 
   if (!adminEmail || !adminPassword) {
     throw new Error('❌ Missing ADMIN_EMAIL or ADMIN_INITIAL_PASSWORD environment variables.');
@@ -68,7 +68,7 @@ async function main() {
 
   console.log(`✅ Sample Partner user created: ${testUser.email}`);
 
-  // 3. Seed Sponsorship Packages with updated exact requested prices ($50 Shorts, $300 Long Video)
+  // 3. Seed Sponsorship Packages
   await prisma.sponsorshipPackage.deleteMany({});
   const packages = [
     {
@@ -132,37 +132,11 @@ async function main() {
         '60-90 Second Organic Mid-Roll Segment',
         'Verbal Call-to-Action & Visual Screen Overlay',
         'Top Description Link Placement',
-        'High Engagement Placement',
       ]),
       featuresTr: JSON.stringify([
         '60-90 Saniye Doğal Mid-Roll Bölümü',
         'Sözlü Çağrı ve Görsel Ekran Görseli',
         'Açıklama Bağlantısı Yerleşimi',
-        'Yüksek Etkileşimli Bölüm',
-      ]),
-    },
-    {
-      titleEn: 'Brand Ambassador Program',
-      titleTr: 'Marka Elçiliği Programı',
-      descEn: 'Long-term 3 to 6 month partnership including regular Shorts, Long Videos, social shoutouts & custom events.',
-      descTr: 'Düzenli Shorts, Uzun Videolar, sosyal medya duyuruları ve özel etkinlikleri içeren 3-6 aylık uzun süreli ortaklık.',
-      price: 'Custom Quote',
-      showPrice: false,
-      isPopular: false,
-      orderIndex: 4,
-      featuresEn: JSON.stringify([
-        'Monthly Content Package (Shorts + Long Videos)',
-        'Exclusive Category Rights',
-        'Custom In-Game Branding / Skins',
-        'VIP Discord & Community Spotlight',
-        'Dedicated Campaign Manager',
-      ]),
-      featuresTr: JSON.stringify([
-        'Aylık İçerik Paketi (Shorts + Videolar)',
-        'Kategoriye Özel Münhasırlık',
-        'Özel Oyuniçi Markalama / Ciltler',
-        'VIP Discord ve Topluluk Öne Çıkarma',
-        'Özel Kampanya Yöneticisi',
       ]),
     },
   ];
@@ -170,7 +144,6 @@ async function main() {
   for (const pkg of packages) {
     await prisma.sponsorshipPackage.create({ data: pkg });
   }
-  console.log('✅ Sponsorship packages seeded with $50 Shorts & $300 Long Video');
 
   // 4. Seed FAQs
   await prisma.fAQ.deleteMany({});
@@ -191,85 +164,12 @@ async function main() {
       category: 'Audience',
       orderIndex: 2,
     },
-    {
-      questionEn: 'How long does it take to produce a sponsored video?',
-      questionTr: 'Sponsorlu bir videonun hazırlanması ne kadar sürer?',
-      answerEn: 'Shorts sponsorships ($50) typically take 3-5 business days after script approval. Dedicated long videos ($300) take 7-10 business days.',
-      answerTr: 'Shorts sponsorlukları ($50) senaryo onayından sonra 3-5 iş günü; özel uzun videolar ($300) ise 7-10 iş günü sürmektedir.',
-      category: 'Sponsorship',
-      orderIndex: 3,
-    },
-    {
-      questionEn: 'Can we track campaign performance and links?',
-      questionTr: 'Kampanya performansını ve bağlantıları takip edebilir miyiz?',
-      answerEn: 'Yes! We provide trackable custom bit.ly or UTM links along with a detailed 7-day analytics report post-upload.',
-      answerTr: 'Evet! Özel UTM bağlantıları ve video yüklendikten 7 gün sonra detaylı bir analitik raporu sunuyoruz.',
-      category: 'Analytics',
-      orderIndex: 4,
-    },
   ];
 
   for (const faq of faqs) {
     await prisma.fAQ.create({ data: faq });
   }
-  console.log('✅ FAQs seeded');
 
-  // 5. Seed Site Settings
-  const settings = [
-    { key: 'maintenance_mode', value: 'false' },
-    { key: 'registration_open', value: 'true' },
-    { key: 'announcement_banner', value: '🚀 Open for Sponsorship Deals! $50 Shorts & $300 Dedicated Long Videos.' },
-    { key: 'subscribers_count', value: '385000' },
-    { key: 'total_views', value: '142000000' },
-    { key: 'total_videos', value: '340' },
-    { key: 'contact_email', value: 'umran3639828@gmail.com' },
-    { key: 'channel_handle', value: '@DarNedYt' },
-    { key: 'channel_url', value: 'https://www.youtube.com/@DarNedYt' },
-  ];
-
-  for (const setting of settings) {
-    await prisma.siteSetting.upsert({
-      where: { key: setting.key },
-      update: { value: setting.value },
-      create: setting,
-    });
-  }
-  console.log('✅ Site settings seeded');
-
-  // 6. Seed Initial Test Ticket
-  const sampleTicket = await prisma.ticket.upsert({
-    where: { ticketNumber: 'TICK-984210' },
-    update: {},
-    create: {
-      ticketNumber: 'TICK-984210',
-      userId: testUser.id,
-      name: 'Alex Johnson',
-      company: 'PixelCraft Studios',
-      email: 'partner@brandexample.com',
-      phone: '+1 555-019-2834',
-      category: TicketCategory.SPONSORSHIP,
-      subject: 'Minecraft Server Launch Campaign Proposal',
-      message: 'Hello DarNed Team,\n\nWe are launching a new custom Minecraft RPG server next month and would love to collaborate on a dedicated 60s Shorts video + mid-roll integration.\n\nLooking forward to hearing from you!',
-      estimatedBudget: '$50 - $300',
-      startDate: '2026-08-15',
-      contentType: 'YouTube Shorts + Mid-roll',
-      status: TicketStatus.OPEN,
-      priority: TicketPriority.HIGH,
-    },
-  });
-
-  await prisma.ticketMessage.create({
-    data: {
-      ticketId: sampleTicket.id,
-      senderId: testUser.id,
-      senderName: testUser.name,
-      senderEmail: testUser.email,
-      isFromAdmin: false,
-      message: sampleTicket.message,
-    },
-  });
-
-  console.log(`✅ Sample ticket created: ${sampleTicket.ticketNumber}`);
   console.log('🎉 Database seeding completed successfully!');
 }
 
