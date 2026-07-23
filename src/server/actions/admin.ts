@@ -115,6 +115,17 @@ export async function upsertPackageAction(formData: any) {
   }
 }
 
+export async function deletePackageAction(id: string) {
+  try {
+    const admin = await checkAdminAuth();
+    await db.sponsorshipPackage.delete({ where: { id } });
+    await createAuditLog(admin.userId, 'PACKAGE_DELETED', `Package ID ${id} deleted`);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error?.message || 'Failed to delete package' };
+  }
+}
+
 export async function updateSiteSettingAction(key: string, value: string) {
   try {
     const admin = await checkAdminAuth();
