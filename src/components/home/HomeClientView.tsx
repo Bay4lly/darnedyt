@@ -12,7 +12,6 @@ import {
   ChevronUp,
   ExternalLink,
   Globe2,
-  Play,
   ShieldCheck,
   Sparkles,
   Trophy,
@@ -39,33 +38,33 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
   // Exact DarNed YouTube Shorts from user provided links
   const defaultShorts = [
     {
-      id: 'short-1',
+      id: 'XkOo3DhOv38',
       videoId: 'XkOo3DhOv38',
-      directUrl: 'https://www.youtube.com/shorts/XkOo3DhOv38',
+      url: 'https://www.youtube.com/shorts/XkOo3DhOv38',
     },
     {
-      id: 'short-2',
+      id: 'FeyfzeGnPzg',
       videoId: 'FeyfzeGnPzg',
-      directUrl: 'https://www.youtube.com/shorts/FeyfzeGnPzg',
+      url: 'https://www.youtube.com/shorts/FeyfzeGnPzg',
     },
     {
-      id: 'short-3',
+      id: 'KF8oj78vXso',
       videoId: 'KF8oj78vXso',
-      directUrl: 'https://www.youtube.com/shorts/KF8oj78vXso',
+      url: 'https://www.youtube.com/shorts/KF8oj78vXso',
     },
   ];
 
   // Exact DarNed YouTube Long Videos from user provided links
   const defaultLongVideos = [
     {
-      id: 'video-1',
+      id: 'XquuW9266M8',
       videoId: 'XquuW9266M8',
-      directUrl: 'https://www.youtube.com/watch?v=XquuW9266M8',
+      url: 'https://www.youtube.com/watch?v=XquuW9266M8',
     },
     {
-      id: 'video-2',
+      id: 'qfAgc_vzxlY',
       videoId: 'qfAgc_vzxlY',
-      directUrl: 'https://www.youtube.com/watch?v=qfAgc_vzxlY',
+      url: 'https://www.youtube.com/watch?v=qfAgc_vzxlY',
     },
   ];
 
@@ -232,12 +231,14 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {shortsToDisplay.map((short: any) => {
-            const vId = short.videoId || short.id;
-            const directUrl = short.directUrl || `https://www.youtube.com/shorts/${vId}`;
+            const vId = (short.id && short.id.length > 5) ? short.id : (short.videoId || 'XkOo3DhOv38');
+            const directUrl = (short.url && short.url.includes('youtube.com'))
+              ? short.url
+              : `https://www.youtube.com/shorts/${vId}`;
 
             return (
               <div
-                key={short.id}
+                key={vId}
                 className="group relative rounded-2xl overflow-hidden border border-white/10 bg-card hover:border-brand-pink/50 transition-all duration-300 shadow-xl flex flex-col"
               >
                 {/* Responsive Embedded YouTube Player */}
@@ -284,12 +285,14 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {videosToDisplay.map((video: any) => {
-            const vId = video.videoId || video.id;
-            const directUrl = video.directUrl || `https://www.youtube.com/watch?v=${vId}`;
+            const vId = (video.id && video.id.length > 5) ? video.id : (video.videoId || 'XquuW9266M8');
+            const directUrl = (video.url && video.url.includes('youtube.com'))
+              ? video.url
+              : `https://www.youtube.com/watch?v=${vId}`;
 
             return (
               <div
-                key={video.id}
+                key={vId}
                 className="group rounded-2xl border border-white/10 bg-card overflow-hidden hover:border-brand-purple/50 transition-all shadow-xl flex flex-col"
               >
                 {/* Responsive Embedded YouTube Player */}

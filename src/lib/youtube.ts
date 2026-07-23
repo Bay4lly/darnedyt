@@ -79,10 +79,6 @@ export async function fetchLiveYouTubeStats(): Promise<{
         if (foundVideos.length > 0) {
           scrapedVideos = foundVideos.filter(v => !v.isShort).slice(0, 2);
           scrapedShorts = foundVideos.filter(v => v.isShort).slice(0, 3);
-
-          if (scrapedShorts.length === 0 && foundVideos.length > 2) {
-            scrapedShorts = foundVideos.slice(2, 5).map(v => ({ ...v, isShort: true }));
-          }
         }
       }
     }
@@ -90,64 +86,54 @@ export async function fetchLiveYouTubeStats(): Promise<{
     console.warn('YouTube scraping notice:', err);
   }
 
+  // Exact DarNed Videos provided by user
   if (scrapedVideos.length === 0) {
     scrapedVideos = [
       {
-        id: 'real-v1',
-        title: 'I Survived 100 Days in Hardcore Minecraft Nether World!',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        url: 'https://www.youtube.com/@DarNedYt',
-        publishedAt: 'Recent Upload',
-        views: '850K Views',
+        id: 'XquuW9266M8',
+        title: 'DarNed Gameplay Video 1',
+        thumbnail: 'https://i.ytimg.com/vi/XquuW9266M8/hqdefault.jpg',
+        url: 'https://www.youtube.com/watch?v=XquuW9266M8',
+        publishedAt: 'DarNed Official',
       },
       {
-        id: 'real-v2',
-        title: 'Testing 50 VIRAL Minecraft Hacks to See If They ACTUALLY Work!',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        url: 'https://www.youtube.com/@DarNedYt',
-        publishedAt: 'Recent Upload',
-        views: '1.2M Views',
+        id: 'qfAgc_vzxlY',
+        title: 'DarNed Gameplay Video 2',
+        thumbnail: 'https://i.ytimg.com/vi/qfAgc_vzxlY/hqdefault.jpg',
+        url: 'https://www.youtube.com/watch?v=qfAgc_vzxlY',
+        publishedAt: 'DarNed Official',
       },
     ];
   }
 
+  // Exact DarNed Shorts provided by user
   if (scrapedShorts.length === 0) {
     scrapedShorts = [
       {
-        id: 'real-s1',
-        title: 'Minecraft But You Only Have 1 Heart Level 999 Challenge!',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        url: 'https://www.youtube.com/@DarNedYt/shorts',
-        publishedAt: 'Recent Short',
-        views: '4.1M Views',
+        id: 'XkOo3DhOv38',
+        title: 'DarNed Short 1',
+        thumbnail: 'https://i.ytimg.com/vi/XkOo3DhOv38/hqdefault.jpg',
+        url: 'https://www.youtube.com/shorts/XkOo3DhOv38',
+        publishedAt: 'DarNed Short',
         isShort: true,
       },
       {
-        id: 'real-s2',
-        title: 'Can You Escape The Ultimate Custom Warden Trap in 30 Seconds?',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        url: 'https://www.youtube.com/@DarNedYt/shorts',
-        publishedAt: 'Recent Short',
-        views: '1.8M Views',
+        id: 'FeyfzeGnPzg',
+        title: 'DarNed Short 2',
+        thumbnail: 'https://i.ytimg.com/vi/FeyfzeGnPzg/hqdefault.jpg',
+        url: 'https://www.youtube.com/shorts/FeyfzeGnPzg',
+        publishedAt: 'DarNed Short',
         isShort: true,
       },
       {
-        id: 'real-s3',
-        title: 'Secret Minecraft Bedrock Glitch That Lets You Fly Without Elytra!',
-        thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-        url: 'https://www.youtube.com/@DarNedYt/shorts',
-        publishedAt: 'Recent Short',
-        views: '2.4M Views',
+        id: 'KF8oj78vXso',
+        title: 'DarNed Short 3',
+        thumbnail: 'https://i.ytimg.com/vi/KF8oj78vXso/hqdefault.jpg',
+        url: 'https://www.youtube.com/shorts/KF8oj78vXso',
+        publishedAt: 'DarNed Short',
         isShort: true,
       },
     ];
-  }
-
-  try {
-    db.siteSetting.upsert({ where: { key: 'subscribers_count' }, update: { value: subCount }, create: { key: 'subscribers_count', value: subCount } }).catch(() => {});
-    db.siteSetting.upsert({ where: { key: 'total_views' }, update: { value: viewCount }, create: { key: 'total_views', value: viewCount } }).catch(() => {});
-  } catch (e) {
-    // Ignore db cache write error
   }
 
   return {
@@ -185,16 +171,14 @@ function extractVideosFromInitialData(obj: any): YouTubeVideoItem[] {
       const videoId = v.videoId;
       const title = v.title?.runs?.[0]?.text || v.title?.simpleText;
       const thumbnail = v.thumbnail?.thumbnails?.[v.thumbnail?.thumbnails?.length - 1]?.url;
-      const viewText = v.viewCountText?.simpleText || v.shortViewCountText?.simpleText;
 
-      if (videoId && title) {
+      if (videoId && videoId.length > 3 && title) {
         results.push({
           id: videoId,
           title,
           thumbnail: thumbnail || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
           url: `https://www.youtube.com/watch?v=${videoId}`,
           publishedAt: v.publishedTimeText?.simpleText || '',
-          views: viewText || '',
           isShort: Boolean(v.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url?.includes('/shorts/')),
         });
       }
@@ -206,7 +190,7 @@ function extractVideosFromInitialData(obj: any): YouTubeVideoItem[] {
       const title = r.headline?.simpleText || r.headline?.runs?.[0]?.text;
       const thumbnail = r.thumbnail?.thumbnails?.[0]?.url;
 
-      if (videoId && title) {
+      if (videoId && videoId.length > 3 && title) {
         results.push({
           id: videoId,
           title,
