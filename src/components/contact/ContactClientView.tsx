@@ -120,7 +120,7 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
       <div className="text-center space-y-4 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-purple/20 border border-brand-purple/40 text-brand-pink text-xs font-mono font-bold uppercase">
           <Mail className="w-4 h-4 text-brand-cyan" />
-          {t.contact.badge}
+          Contact & Sponsorship Inquiry
         </div>
         <h1 className="font-display text-4xl sm:text-6xl font-black text-white">
           {t.contact.title}
