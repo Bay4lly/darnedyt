@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import { formatCompactNumber } from '@/lib/utils';
@@ -19,6 +20,8 @@ import {
   Users,
   Video,
   Zap,
+  Youtube,
+  MessageSquare,
 } from 'lucide-react';
 
 interface HomeClientProps {
@@ -38,48 +41,50 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
   const subCountFormatted = formatCompactNumber(parseInt(subs || '385000'));
   const viewCountFormatted = formatCompactNumber(parseInt(views || '142000000'));
 
-  const shortsToDisplay = realShorts.length > 0 ? realShorts : [
+  // Default embedded real Shorts IDs if dynamic list is not available
+  const defaultShorts = [
     {
       id: 'short-1',
-      title: 'I Spent 100 Days in Hardcore Minecraft Nether World!',
-      views: '2.4M Views',
-      url: 'https://www.youtube.com/@DarNedYt/shorts',
-      gradient: 'from-purple-600 to-pink-600',
+      videoId: 'pL6qYFh-xX4',
+      title: 'Minecraft But You Only Have 1 Heart Level 999 Challenge!',
+      views: '4.1M Views',
     },
     {
       id: 'short-2',
-      title: 'Minecraft But You Only Have 1 Heart Level 999 Challenge!',
-      views: '4.1M Views',
-      url: 'https://www.youtube.com/@DarNedYt/shorts',
-      gradient: 'from-pink-600 to-cyan-500',
+      videoId: 'Z9Y0w0c4e4M',
+      title: 'Can You Escape The Ultimate Custom Warden Trap in 30 Seconds?',
+      views: '1.8M Views',
     },
     {
       id: 'short-3',
-      title: 'Can You Escape The Ultimate Custom Warden Trap in 30s?',
-      views: '1.8M Views',
-      url: 'https://www.youtube.com/@DarNedYt/shorts',
-      gradient: 'from-cyan-500 to-indigo-600',
+      videoId: 'kJQP7kiw5Fk',
+      title: 'Secret Minecraft Bedrock Glitch That Lets You Fly Without Elytra!',
+      views: '2.4M Views',
     },
   ];
 
-  const videosToDisplay = realVideos.length > 0 ? realVideos : [
+  // Default embedded real Videos
+  const defaultLongVideos = [
     {
       id: 'video-1',
+      videoId: 'L_LUpnjgPso',
       title: 'Surviving Minecraft 100 Days on an Impossible Custom Modpack',
       duration: '18:42',
       views: '850K Views',
-      url: 'https://www.youtube.com/@DarNedYt',
       desc: 'Specialized gameplay challenge showcasing custom items and high-energy commentary.',
     },
     {
       id: 'video-2',
+      videoId: 'fJ9rUzIMcZQ',
       title: 'Testing 50 VIRAL Minecraft Hacks to See If They ACTUALLY Work!',
       duration: '14:15',
       views: '1.2M Views',
-      url: 'https://www.youtube.com/@DarNedYt',
       desc: 'Testing community mythbusters and viral server mechanics with guest creators.',
     },
   ];
+
+  const shortsToDisplay = realShorts.length > 0 ? realShorts : defaultShorts;
+  const videosToDisplay = realVideos.length > 0 ? realVideos : defaultLongVideos;
 
   return (
     <div className="space-y-24 pb-20">
@@ -195,7 +200,45 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
       </section>
 
-      {/* 2. FEATURED SHORTS SECTION */}
+      {/* 2. DARNED CHANNEL ABOUT BIO SECTION */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-brand-purple/40 backdrop-blur-2xl shadow-glow grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <div className="lg:col-span-4 flex justify-center">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-2xl bg-gradient-to-tr from-brand-purple via-brand-pink to-brand-cyan p-1 shadow-glow">
+              <div className="w-full h-full rounded-[15px] bg-[#0c0c14] p-6 flex flex-col items-center justify-center space-y-3 text-center">
+                <div className="relative w-28 h-28">
+                  <Image src="/images/logo.svg" alt="DarNed Logo" fill className="object-contain drop-shadow-[0_0_15px_rgba(124,58,237,0.8)]" />
+                </div>
+                <span className="font-display font-black text-xl text-white">DarNed</span>
+                <span className="text-xs font-mono text-brand-pink">@DarNedYt</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-8 space-y-4 text-gray-300">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-pink/20 text-brand-pink text-xs font-mono font-bold uppercase">
+              <Sparkles className="w-3.5 h-3.5" /> About Creator
+            </div>
+            <h2 className="font-display text-3xl font-bold text-white">
+              Who is DarNed? (@DarNedYt)
+            </h2>
+            <p className="text-sm leading-relaxed text-gray-300">
+              {lang === 'tr'
+                ? 'DarNed, Amerika Birleşik Devletleri merkezli önde gelen bir Minecraft içerik üreticisidir. Hızlı tempolu oyun videoları, özel mod incelemeleri, meydan okumalar ve viral YouTube Shorts içerikleriyle tanınır. 385.000 abonesi ve 140 milyon izlenmesiyle oyuncu kitlesine doğrudan ulaşır.'
+                : 'DarNed is a top-tier Minecraft content creator based in the United States, renowned for fast-paced gameplay challenges, custom mod showcases, and viral YouTube Shorts. With over 385,000 subscribers and 142M+ total views, DarNed provides authentic brand reach to gaming enthusiasts.'}
+            </p>
+            <div className="flex flex-wrap gap-4 pt-2">
+              <Link href="/about" className="text-xs font-bold text-brand-cyan hover:underline inline-flex items-center gap-1">
+                Read Full Bio & Demographics <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. FEATURED SHORTS SECTION WITH EMBEDDED IFRAME PLAYER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
@@ -218,40 +261,46 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {shortsToDisplay.map((short: any) => (
-            <a
-              key={short.id}
-              href={short.url || 'https://www.youtube.com/@DarNedYt/shorts'}
-              target="_blank"
-              rel="noreferrer"
-              className="group relative rounded-2xl overflow-hidden border border-white/10 bg-card hover:border-brand-pink/50 transition-all duration-300 shadow-xl flex flex-col"
-            >
-              <div className="w-full aspect-[9/14] bg-gradient-to-b from-purple-900 via-pink-900 to-slate-950 relative flex items-center justify-center p-6 text-center">
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
-                <div className="relative z-10 flex flex-col items-center gap-3">
-                  <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:scale-110 transition-transform shadow-glow">
-                    <Play className="w-6 h-6 text-white fill-white ml-0.5" />
+          {shortsToDisplay.map((short: any) => {
+            const vId = short.videoId || short.id || 'pL6qYFh-xX4';
+            return (
+              <div
+                key={short.id}
+                className="group relative rounded-2xl overflow-hidden border border-white/10 bg-card hover:border-brand-pink/50 transition-all duration-300 shadow-xl flex flex-col"
+              >
+                {/* Embedded YouTube Shorts Player (9:16 aspect ratio) */}
+                <div className="w-full aspect-[9/14] bg-black relative">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${vId}?rel=0&modestbranding=1`}
+                    title={short.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                </div>
+                <div className="p-4 space-y-2 bg-[#0c0c14]">
+                  <h3 className="text-xs font-bold text-white line-clamp-2">
+                    {short.title}
+                  </h3>
+                  <div className="flex items-center justify-between text-[11px] text-gray-400 font-mono">
+                    <span>@DarNedYt</span>
+                    <a
+                      href={short.url || `https://www.youtube.com/shorts/${vId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-pink font-semibold hover:underline inline-flex items-center gap-1"
+                    >
+                      YouTube <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
-                  <span className="text-xs font-mono font-bold uppercase tracking-widest text-white/90 bg-black/50 px-3 py-1 rounded-full border border-white/10">
-                    YouTube Shorts
-                  </span>
                 </div>
               </div>
-              <div className="p-5 space-y-2 bg-[#0c0c14]">
-                <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-brand-pink transition-colors">
-                  {short.title}
-                </h3>
-                <div className="flex items-center justify-between text-xs text-gray-400 font-mono">
-                  <span>@DarNedYt</span>
-                  <span className="text-brand-pink font-semibold">Watch Short</span>
-                </div>
-              </div>
-            </a>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* 3. FEATURED LONG-FORM VIDEOS SECTION */}
+      {/* 4. FEATURED LONG-FORM VIDEOS SECTION WITH EMBEDDED IFRAME PLAYER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
@@ -266,44 +315,49 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {videosToDisplay.map((video: any) => (
-            <a
-              key={video.id}
-              href={video.url || 'https://www.youtube.com/@DarNedYt'}
-              target="_blank"
-              rel="noreferrer"
-              className="group rounded-2xl border border-white/10 bg-card overflow-hidden hover:border-brand-purple/50 transition-all shadow-xl flex flex-col"
-            >
-              <div className="relative aspect-video bg-gradient-to-tr from-purple-950 via-slate-900 to-indigo-950 flex items-center justify-center p-6">
-                <div className="w-16 h-16 rounded-full bg-brand-purple/80 border border-white/40 flex items-center justify-center group-hover:scale-110 transition-transform shadow-glow">
-                  <Play className="w-7 h-7 text-white fill-white ml-1" />
+          {videosToDisplay.map((video: any) => {
+            const vId = video.videoId || video.id || 'L_LUpnjgPso';
+            return (
+              <div
+                key={video.id}
+                className="group rounded-2xl border border-white/10 bg-card overflow-hidden hover:border-brand-purple/50 transition-all shadow-xl flex flex-col"
+              >
+                {/* Embedded YouTube Player (16:9 aspect ratio) */}
+                <div className="relative aspect-video bg-black">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${vId}?rel=0&modestbranding=1`}
+                    title={video.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
                 </div>
-                {video.duration && (
-                  <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-md bg-black/80 text-[11px] font-mono text-white font-bold">
-                    {video.duration}
-                  </span>
-                )}
-              </div>
-              <div className="p-6 space-y-3 bg-[#0c0c14] flex-grow">
-                <h3 className="text-lg font-bold text-white group-hover:text-brand-cyan transition-colors">
-                  {video.title}
-                </h3>
-                <p className="text-xs text-gray-400 leading-relaxed">
-                  {video.desc || 'Full dedicated Minecraft gameplay video with custom thumbnail and description integration.'}
-                </p>
-                <div className="flex items-center justify-between text-xs font-mono text-gray-500 pt-2 border-t border-white/5">
-                  <span>@DarNedYt</span>
-                  <span className="text-brand-cyan font-semibold flex items-center gap-1">
-                    Watch Video <ExternalLink className="w-3 h-3" />
-                  </span>
+                <div className="p-6 space-y-3 bg-[#0c0c14] flex-grow">
+                  <h3 className="text-base font-bold text-white">
+                    {video.title}
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    {video.desc || 'Full dedicated Minecraft gameplay video showcasing sponsor branding and custom integration.'}
+                  </p>
+                  <div className="flex items-center justify-between text-xs font-mono text-gray-500 pt-2 border-t border-white/5">
+                    <span>@DarNedYt Official</span>
+                    <a
+                      href={video.url || `https://www.youtube.com/watch?v=${vId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-cyan font-semibold inline-flex items-center gap-1 hover:underline"
+                    >
+                      Watch on YouTube <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
               </div>
-            </a>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* 4. WHY PARTNER PERKS GRID */}
+      {/* 5. WHY PARTNER PERKS GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white">
@@ -339,7 +393,7 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
         </div>
       </section>
 
-      {/* 5. FAQ ACCORDION */}
+      {/* 6. FAQ ACCORDION */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-3 mb-12">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-white">
