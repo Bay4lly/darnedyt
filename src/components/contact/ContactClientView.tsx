@@ -21,6 +21,17 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
+function cleanHtmlEntities(str: string): string {
+  if (!str) return '';
+  return decodeURIComponent(str)
+    .replace(/&#x2F;/gi, '/')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+}
+
 export function ContactClientView({ userSession }: { userSession?: any }) {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
@@ -28,18 +39,20 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdTicketNumber, setCreatedTicketNumber] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
 
-  const defaultPackage = searchParams.get('package') || '';
-  const defaultPrice = searchParams.get('price') || '';
+  const rawPackage = searchParams.get('package') || '';
+  const rawPrice = searchParams.get('price') || '';
   const defaultCategory = searchParams.get('category') || 'SPONSORSHIP';
+
+  const defaultPackage = cleanHtmlEntities(rawPackage);
+  const defaultPrice = cleanHtmlEntities(rawPrice);
 
   const initialSubject = defaultPackage
     ? `Sponsorship Quote Request: ${defaultPackage}${defaultPrice ? ` (${defaultPrice})` : ''}`
     : '';
 
   const initialMessage = defaultPackage
-    ? `Hello DarNed Team,\n\nI would like to request a quote / book the "${defaultPackage}" package${defaultPrice ? ` (${defaultPrice})` : ''}.\n\nCampaign / Branding Details:\n- Brand / Minecraft Server Name:\n- Promotion Objectives:\n- Preferred Launch Date:\n\nPlease let us know the next steps for collaboration!`
+    ? `Hello DarNed Team,\n\nI would like to book the ${defaultPackage} package (${defaultPrice}).\n\nCampaign Details:\n- Brand / Server Name:\n- Promotion Goals:\n- Target Launch Date:\n\nPlease let us know the next steps for onboarding!`
     : '';
 
   const initialBudget = defaultPrice || (defaultPackage ? '$50' : '$1,000 - $2,500');
@@ -69,7 +82,7 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
   useEffect(() => {
     if (defaultPackage) {
       const subjectText = `Sponsorship Quote Request: ${defaultPackage}${defaultPrice ? ` (${defaultPrice})` : ''}`;
-      const messageText = `Hello DarNed Team,\n\nI would like to request a quote / book the "${defaultPackage}" package${defaultPrice ? ` (${defaultPrice})` : ''}.\n\nCampaign / Branding Details:\n- Brand / Minecraft Server Name:\n- Promotion Objectives:\n- Preferred Launch Date:\n\nPlease let us know the next steps for collaboration!`;
+      const messageText = `Hello DarNed Team,\n\nI would like to book the ${defaultPackage} package (${defaultPrice}).\n\nCampaign Details:\n- Brand / Server Name:\n- Promotion Goals:\n- Target Launch Date:\n\nPlease let us know the next steps for onboarding!`;
 
       setValue('subject', subjectText);
       setValue('message', messageText);
@@ -91,17 +104,6 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
       setToast({ type: 'success', message: 'Inquiry submitted successfully!' });
     } else {
       setToast({ type: 'error', message: res.error || 'Failed to submit inquiry.' });
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setToast({ type: 'error', message: 'File size exceeds 10MB limit.' });
-        return;
-      }
-      setFileName(file.name);
     }
   };
 
