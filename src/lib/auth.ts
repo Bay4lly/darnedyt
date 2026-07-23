@@ -27,30 +27,34 @@ export function verifyJwtToken(token: string): UserSessionPayload | null {
 }
 
 export async function getSessionUser(): Promise<UserSessionPayload | null> {
-  const cookieStore = cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
 
-  if (!token) return null;
+    if (!token) return null;
 
-  const payload = verifyJwtToken(token);
-  if (!payload) return null;
+    const payload = verifyJwtToken(token);
+    if (!payload) return null;
 
-  const dbUser = await db.user.findUnique({
-    where: { id: payload.userId },
-    select: { id: true, isBanned: true, role: true, name: true, email: true, username: true },
-  });
+    const dbUser = await db.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, isBanned: true, role: true, name: true, email: true, username: true },
+    });
 
-  if (!dbUser || dbUser.isBanned) {
+    if (!dbUser || dbUser.isBanned) {
+      return null;
+    }
+
+    return {
+      userId: dbUser.id,
+      email: dbUser.email,
+      username: dbUser.username,
+      name: dbUser.name,
+      role: dbUser.role,
+    };
+  } catch (e) {
     return null;
   }
-
-  return {
-    userId: dbUser.id,
-    email: dbUser.email,
-    username: dbUser.username,
-    name: dbUser.name,
-    role: dbUser.role,
-  };
 }
 
 export async function setSessionCookie(token: string, remember: boolean = false) {

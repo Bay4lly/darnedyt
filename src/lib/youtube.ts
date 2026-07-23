@@ -29,6 +29,7 @@ export async function fetchLiveYouTubeStats(): Promise<{
   let videoCount = '340';
   let avatarUrl = '/images/logo.svg';
 
+  // Read current DB settings safely
   try {
     const settingsList = await db.siteSetting.findMany();
     const settingsMap = settingsList.reduce((acc, curr) => {
@@ -40,7 +41,7 @@ export async function fetchLiveYouTubeStats(): Promise<{
     if (settingsMap.total_views) viewCount = settingsMap.total_views;
     if (settingsMap.total_videos) videoCount = settingsMap.total_videos;
   } catch (e) {
-    console.error('Error reading DB site settings:', e);
+    console.warn('DB settings read notice (using defaults):', e);
   }
 
   let scrapedVideos: YouTubeVideoItem[] = [];
@@ -57,13 +58,10 @@ export async function fetchLiveYouTubeStats(): Promise<{
 
     if (res.ok) {
       const html = await res.text();
-
-      // Compatible regex without /s flag
       const match = html.match(/var ytInitialData\s*=\s*({[\s\S]*?});<\/script>/) || html.match(/window\["ytInitialData"\]\s*=\s*({[\s\S]*?});/);
 
       if (match && match[1]) {
         const json = JSON.parse(match[1]);
-
         const header = json.header?.c4TabbedHeaderRenderer || json.header?.pageHeaderRenderer;
         if (header) {
           const subText = header.subscriberCountText?.simpleText || header.subscriberCountText?.runs?.[0]?.text;
@@ -89,37 +87,7 @@ export async function fetchLiveYouTubeStats(): Promise<{
       }
     }
   } catch (err) {
-    console.warn('YouTube scraping notice (Using cached channel data):', err);
-  }
-
-  if (scrapedVideos.length === 0) {
-    try {
-      const invidiousRes = await fetch('https://inv.tux.pizza/api/v1/channels/by-handle/DarNedYt', {
-        next: { revalidate: 3600 },
-      });
-      if (invidiousRes.ok) {
-        const invData = await invidiousRes.json();
-        if (invData.subCount) subCount = invData.subCount.toString();
-        if (invData.authorThumbnails?.length > 0) avatarUrl = invData.authorThumbnails[invData.authorThumbnails.length - 1].url;
-
-        if (invData.relatedVideos?.length > 0) {
-          const mapped = invData.relatedVideos.map((v: any) => ({
-            id: v.videoId,
-            title: v.title,
-            thumbnail: v.videoThumbnails?.[0]?.url || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`,
-            url: `https://www.youtube.com/watch?v=${v.videoId}`,
-            publishedAt: v.publishedText || '',
-            views: v.viewCount ? `${formatCompactNumber(v.viewCount)} Views` : '',
-            isShort: v.lengthSeconds < 90,
-          }));
-
-          scrapedVideos = mapped.filter((v: any) => !v.isShort).slice(0, 2);
-          scrapedShorts = mapped.filter((v: any) => v.isShort).slice(0, 3);
-        }
-      }
-    } catch (e) {
-      // Ignore fallback error
-    }
+    console.warn('YouTube scraping notice:', err);
   }
 
   if (scrapedVideos.length === 0) {
@@ -175,8 +143,12 @@ export async function fetchLiveYouTubeStats(): Promise<{
     ];
   }
 
-  db.siteSetting.upsert({ where: { key: 'subscribers_count' }, update: { value: subCount }, create: { key: 'subscribers_count', value: subCount } }).catch(() => {});
-  db.siteSetting.upsert({ where: { key: 'total_views' }, update: { value: viewCount }, create: { key: 'total_views', value: viewCount } }).catch(() => {});
+  try {
+    db.siteSetting.upsert({ where: { key: 'subscribers_count' }, update: { value: subCount }, create: { key: 'subscribers_count', value: subCount } }).catch(() => {});
+    db.siteSetting.upsert({ where: { key: 'total_views' }, update: { value: viewCount }, create: { key: 'total_views', value: viewCount } }).catch(() => {});
+  } catch (e) {
+    // Ignore db cache write error
+  }
 
   return {
     stats: {
@@ -255,10 +227,4 @@ function extractVideosFromInitialData(obj: any): YouTubeVideoItem[] {
 
   traverse(obj);
   return results;
-}
-
-function formatCompactNumber(num: number): string {
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toString();
 }
