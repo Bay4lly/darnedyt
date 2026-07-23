@@ -31,7 +31,18 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
   const [fileName, setFileName] = useState<string | null>(null);
 
   const defaultPackage = searchParams.get('package') || '';
+  const defaultPrice = searchParams.get('price') || '';
   const defaultCategory = searchParams.get('category') || 'SPONSORSHIP';
+
+  const initialSubject = defaultPackage
+    ? `Sponsorship Quote Request: ${defaultPackage}${defaultPrice ? ` (${defaultPrice})` : ''}`
+    : '';
+
+  const initialMessage = defaultPackage
+    ? `Hello DarNed Team,\n\nI would like to request a quote / book the "${defaultPackage}" package${defaultPrice ? ` (${defaultPrice})` : ''}.\n\nCampaign / Branding Details:\n- Brand / Minecraft Server Name:\n- Promotion Objectives:\n- Preferred Launch Date:\n\nPlease let us know the next steps for collaboration!`
+    : '';
+
+  const initialBudget = defaultPrice || (defaultPackage ? '$50' : '$1,000 - $2,500');
 
   const {
     register,
@@ -46,9 +57,9 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
       email: userSession?.email || '',
       phone: '',
       category: defaultCategory as any,
-      subject: defaultPackage ? `Sponsorship Request: ${defaultPackage}` : '',
-      message: defaultPackage ? `Hello DarNed team,\n\nWe are interested in booking the "${defaultPackage}" package for our upcoming campaign.` : '',
-      estimatedBudget: '$1,000 - $2,500',
+      subject: initialSubject,
+      message: initialMessage,
+      estimatedBudget: initialBudget,
       startDate: '',
       contentType: defaultPackage || 'YouTube Shorts',
       agreeTerms: true as const,
@@ -57,10 +68,16 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
 
   useEffect(() => {
     if (defaultPackage) {
-      setValue('subject', `Sponsorship Request: ${defaultPackage}`);
-      setValue('message', `Hello DarNed team,\n\nWe are interested in booking the "${defaultPackage}" package for our upcoming campaign.`);
+      const subjectText = `Sponsorship Quote Request: ${defaultPackage}${defaultPrice ? ` (${defaultPrice})` : ''}`;
+      const messageText = `Hello DarNed Team,\n\nI would like to request a quote / book the "${defaultPackage}" package${defaultPrice ? ` (${defaultPrice})` : ''}.\n\nCampaign / Branding Details:\n- Brand / Minecraft Server Name:\n- Promotion Objectives:\n- Preferred Launch Date:\n\nPlease let us know the next steps for collaboration!`;
+
+      setValue('subject', subjectText);
+      setValue('message', messageText);
+      if (defaultPrice) {
+        setValue('estimatedBudget', defaultPrice);
+      }
     }
-  }, [defaultPackage, setValue]);
+  }, [defaultPackage, defaultPrice, setValue]);
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -103,49 +120,68 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
       <div className="text-center space-y-4 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-purple/20 border border-brand-purple/40 text-brand-pink text-xs font-mono font-bold uppercase">
           <Mail className="w-4 h-4 text-brand-cyan" />
-          {t.contact.title}
+          {t.contact.badge}
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-black text-white">
-          {t.contact.subtitle}
+        <h1 className="font-display text-4xl sm:text-6xl font-black text-white">
+          {t.contact.title}
         </h1>
+        <p className="text-sm sm:text-base text-gray-300">
+          {t.contact.subtitle}
+        </p>
       </div>
 
+      {/* Confirmation View after submission */}
       {createdTicketNumber ? (
-        /* Success Screen */
-        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-emerald-500/40 backdrop-blur-2xl shadow-glow text-center space-y-6 max-w-2xl mx-auto">
-          <div className="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-emerald-500/40 text-center space-y-6 max-w-2xl mx-auto backdrop-blur-2xl shadow-glow">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="font-display text-2xl font-bold text-white">
-            {t.contact.successTitle}
-          </h2>
-          <p className="text-xs text-gray-300 leading-relaxed">
-            {t.contact.successDesc}
-          </p>
 
-          <div className="p-4 rounded-xl bg-black/40 border border-white/10 font-mono text-center">
-            <span className="text-xs text-gray-400 block mb-1">{t.contact.ticketIdLabel}</span>
-            <span className="text-xl font-black text-brand-pink tracking-widest">{createdTicketNumber}</span>
+          <div className="space-y-2">
+            <h2 className="font-display text-2xl font-bold text-white">Inquiry Received!</h2>
+            <p className="text-xs text-gray-300">
+              Your inquiry has been logged. Our sponsorship team will respond within 24 business hours.
+            </p>
           </div>
 
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="p-4 rounded-xl bg-black/60 border border-white/10 font-mono space-y-1">
+            <span className="text-[10px] text-gray-400 uppercase tracking-widest block">Reference Ticket ID</span>
+            <span className="text-2xl font-black text-brand-pink tracking-wider block">
+              {createdTicketNumber}
+            </span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
-              href={`/dashboard/tickets/${createdTicketNumber}`}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-brand-purple to-brand-pink text-white text-xs font-bold shadow-glow"
+              href="/dashboard"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold text-xs shadow-glow hover:opacity-95 transition-all"
             >
-              Track Ticket Progress
+              View in Partner Dashboard
             </Link>
             <button
               onClick={() => setCreatedTicketNumber(null)}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold"
+              className="px-6 py-3 rounded-xl bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition-all border border-white/10"
             >
               Submit Another Inquiry
             </button>
           </div>
         </div>
       ) : (
-        /* Form View */
-        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-white/10 backdrop-blur-2xl shadow-2xl">
+        /* Form Card */
+        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-white/10 backdrop-blur-2xl shadow-2xl space-y-8">
+          
+          {defaultPackage && (
+            <div className="p-4 rounded-2xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-brand-pink flex-shrink-0" />
+                <span className="text-xs text-white">
+                  Selected Package: <strong className="text-brand-pink font-bold">{defaultPackage}</strong> {defaultPrice && <span className="font-mono text-emerald-400 font-bold">({defaultPrice})</span>}
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-gray-400">Pre-filled Inquiry</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             
             {/* Grid 1: Name & Company */}
@@ -236,12 +272,15 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
                   {...register('estimatedBudget')}
                   className="w-full px-4 py-3 rounded-xl bg-[#0c0c14] border border-white/10 text-sm text-white focus:outline-none focus:border-brand-purple transition-all"
                 >
+                  <option value="$50">$50 (Shorts Integration)</option>
+                  <option value="$150">$150 (Product Placement)</option>
+                  <option value="$300">$300 (Dedicated Video)</option>
                   <option value="Under $500">Under $500</option>
                   <option value="$500 - $1,000">$500 - $1,000</option>
                   <option value="$1,000 - $2,500">$1,000 - $2,500</option>
                   <option value="$2,500 - $5,000">$2,500 - $5,000</option>
                   <option value="$5,000+">$5,000+</option>
-                  <option value="Undisclosed">Undisclosed / Negotiable</option>
+                  <option value="Custom Quote">Custom Quote / Negotiable</option>
                 </select>
               </div>
             </div>
@@ -253,7 +292,7 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
               </label>
               <input
                 {...register('subject')}
-                placeholder="Minecraft Server Launch Campaign Proposal"
+                placeholder="e.g. Minecraft Server Sponsorship Proposal"
                 className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all"
               />
               {errors.subject && (
@@ -270,9 +309,9 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
               </label>
               <textarea
                 {...register('message')}
-                rows={5}
-                placeholder="Please describe your campaign goals, deliverables required, target timeline, and any special requests..."
-                className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all"
+                rows={6}
+                placeholder="Describe your brand, campaign goals, key deliverables, and target launch timeline..."
+                className="w-full p-4 rounded-xl bg-black/50 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all resize-none"
               />
               {errors.message && (
                 <p className="text-[11px] text-rose-400 flex items-center gap-1">
@@ -281,54 +320,50 @@ export function ContactClientView({ userSession }: { userSession?: any }) {
               )}
             </div>
 
-            {/* Optional File Attachment */}
-            <div className="space-y-2">
-              <label className="text-xs font-mono font-bold text-gray-300 uppercase block">
-                {t.contact.fileUpload}
-              </label>
-              <label className="flex items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-white/20 bg-black/30 hover:border-brand-purple cursor-pointer transition-all">
-                <Upload className="w-5 h-5 text-brand-pink" />
-                <span className="text-xs text-gray-300">
-                  {fileName ? `Selected: ${fileName}` : 'Choose File to Attach (PDF, PNG, JPG)'}
-                </span>
-                <input type="file" onChange={handleFileChange} className="hidden" accept=".pdf,.png,.jpg,.jpeg,.docx" />
-              </label>
-            </div>
-
-            {/* Terms Checkbox */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-3 cursor-pointer">
+            {/* Optional Terms Checkbox */}
+            <div className="pt-2">
+              <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   {...register('agreeTerms')}
-                  className="w-4 h-4 rounded border-white/20 bg-black text-brand-purple focus:ring-brand-purple"
+                  className="mt-1 rounded border-white/20 bg-black/50 text-brand-purple focus:ring-brand-purple"
                 />
-                <span className="text-xs text-gray-300">
-                  {t.contact.agreeTerms}
+                <span className="text-xs text-gray-400 leading-normal">
+                  I agree to the{' '}
+                  <Link href="/terms" className="text-brand-pink underline hover:text-white">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy" className="text-brand-pink underline hover:text-white">
+                    Privacy Policy
+                  </Link>
+                  .
                 </span>
               </label>
               {errors.agreeTerms && (
-                <p className="text-[11px] text-rose-400 flex items-center gap-1">
+                <p className="text-[11px] text-rose-400 mt-1 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" /> {errors.agreeTerms.message as string}
                 </p>
               )}
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-brand-purple via-brand-pink to-brand-cyan text-white font-bold text-sm hover:opacity-95 transition-all shadow-glow flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <span>{t.contact.submitting}</span>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  <span>{t.contact.submit}</span>
-                </>
-              )}
-            </button>
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-brand-purple via-brand-pink to-brand-cyan text-white font-bold text-sm shadow-glow hover:opacity-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span>Submitting Inquiry...</span>
+                ) : (
+                  <>
+                    <span>Submit Sponsorship Inquiry</span>
+                    <Send className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
 
           </form>
         </div>

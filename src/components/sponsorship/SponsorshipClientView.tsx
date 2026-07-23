@@ -39,7 +39,7 @@ export function SponsorshipClientView({ packages }: { packages: any[] }) {
             features = [featuresRaw];
           }
 
-          const targetUrl = `/contact?package=${encodeURIComponent(title)}&category=SPONSORSHIP`;
+          const targetUrl = `/contact?package=${encodeURIComponent(title)}&price=${encodeURIComponent(pkg.price)}&category=SPONSORSHIP`;
 
           return (
             <div
