@@ -13,15 +13,11 @@ import {
   ExternalLink,
   Flame,
   Globe2,
-  Play,
   ShieldCheck,
   Sparkles,
   Trophy,
   Users,
-  Video,
   Zap,
-  Youtube,
-  MessageSquare,
 } from 'lucide-react';
 
 interface HomeClientProps {
@@ -41,36 +37,32 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
   const subCountFormatted = formatCompactNumber(parseInt(subs || '385000'));
   const viewCountFormatted = formatCompactNumber(parseInt(views || '142000000'));
 
-  // Default embedded real Shorts IDs if dynamic list is not available
+  // Embedded Shorts without view counts
   const defaultShorts = [
     {
       id: 'short-1',
       videoId: 'pL6qYFh-xX4',
       title: 'Minecraft But You Only Have 1 Heart Level 999 Challenge!',
-      views: '4.1M Views',
     },
     {
       id: 'short-2',
       videoId: 'Z9Y0w0c4e4M',
       title: 'Can You Escape The Ultimate Custom Warden Trap in 30 Seconds?',
-      views: '1.8M Views',
     },
     {
       id: 'short-3',
       videoId: 'kJQP7kiw5Fk',
       title: 'Secret Minecraft Bedrock Glitch That Lets You Fly Without Elytra!',
-      views: '2.4M Views',
     },
   ];
 
-  // Default embedded real Videos
+  // Embedded Videos without view counts
   const defaultLongVideos = [
     {
       id: 'video-1',
       videoId: 'L_LUpnjgPso',
       title: 'Surviving Minecraft 100 Days on an Impossible Custom Modpack',
       duration: '18:42',
-      views: '850K Views',
       desc: 'Specialized gameplay challenge showcasing custom items and high-energy commentary.',
     },
     {
@@ -78,7 +70,6 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
       videoId: 'fJ9rUzIMcZQ',
       title: 'Testing 50 VIRAL Minecraft Hacks to See If They ACTUALLY Work!',
       duration: '14:15',
-      views: '1.2M Views',
       desc: 'Testing community mythbusters and viral server mechanics with guest creators.',
     },
   ];
@@ -158,12 +149,12 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
 
           </div>
 
-          {/* Stats Bar */}
+          {/* Stats Bar (3 clean metrics) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
-            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6"
+            className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto"
           >
             <div className="bg-card border border-card-border rounded-2xl p-6 backdrop-blur-xl shadow-xl flex flex-col items-center text-center space-y-1 hover:border-brand-purple/50 transition-all group">
               <div className="p-3 rounded-xl bg-purple-500/10 text-brand-purple mb-2 group-hover:scale-110 transition-transform">
@@ -179,14 +170,6 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
               </div>
               <span className="font-display text-3xl font-black text-white">{viewCountFormatted}+</span>
               <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">{t.hero.totalViews}</span>
-            </div>
-
-            <div className="bg-card border border-card-border rounded-2xl p-6 backdrop-blur-xl shadow-xl flex flex-col items-center text-center space-y-1 hover:border-brand-cyan/50 transition-all group">
-              <div className="p-3 rounded-xl bg-cyan-500/10 text-brand-cyan mb-2 group-hover:scale-110 transition-transform">
-                <Video className="w-6 h-6" />
-              </div>
-              <span className="font-display text-3xl font-black text-white">{videos}+</span>
-              <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">{t.hero.videosCreated}</span>
             </div>
 
             <div className="bg-card border border-card-border rounded-2xl p-6 backdrop-blur-xl shadow-xl flex flex-col items-center text-center space-y-1 hover:border-indigo-500/50 transition-all group">
@@ -268,7 +251,6 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
                 key={short.id}
                 className="group relative rounded-2xl overflow-hidden border border-white/10 bg-card hover:border-brand-pink/50 transition-all duration-300 shadow-xl flex flex-col"
               >
-                {/* Embedded YouTube Shorts Player (9:16 aspect ratio) */}
                 <div className="w-full aspect-[9/14] bg-black relative">
                   <iframe
                     src={`https://www.youtube.com/embed/${vId}?rel=0&modestbranding=1`}
@@ -322,7 +304,6 @@ export function HomeClientView({ subs, views, videos, packages, faqs, realVideos
                 key={video.id}
                 className="group rounded-2xl border border-white/10 bg-card overflow-hidden hover:border-brand-purple/50 transition-all shadow-xl flex flex-col"
               >
-                {/* Embedded YouTube Player (16:9 aspect ratio) */}
                 <div className="relative aspect-video bg-black">
                   <iframe
                     src={`https://www.youtube.com/embed/${vId}?rel=0&modestbranding=1`}
