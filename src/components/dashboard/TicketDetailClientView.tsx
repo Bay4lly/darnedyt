@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
@@ -17,6 +17,7 @@ import {
   Send,
   Shield,
   User,
+  RefreshCw,
 } from 'lucide-react';
 
 interface TicketDetailClientProps {
@@ -29,6 +30,14 @@ export function TicketDetailClientView({ userSession, ticket }: TicketDetailClie
   const [replyMessage, setReplyMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
+
+  // Automatic Live Polling for new ticket replies every 6 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [router]);
 
   const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,12 +74,17 @@ export function TicketDetailClientView({ userSession, ticket }: TicketDetailClie
       )}
 
       {/* Back Button */}
-      <Link
-        href="/dashboard"
-        className="inline-flex items-center gap-2 text-xs font-mono font-bold text-gray-400 hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-xs font-mono font-bold text-gray-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </Link>
+        <div className="inline-flex items-center gap-1.5 text-[11px] font-mono text-gray-400">
+          <RefreshCw className="w-3 h-3 text-brand-cyan animate-spin" /> Live Updates Active
+        </div>
+      </div>
 
       {/* Ticket Overview Header Card */}
       <div className="p-8 rounded-3xl bg-card border border-white/10 backdrop-blur-2xl shadow-2xl space-y-6">
@@ -100,98 +114,99 @@ export function TicketDetailClientView({ userSession, ticket }: TicketDetailClie
 
           <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 space-y-1">
             <span className="text-gray-400 font-mono uppercase text-[10px]">Category</span>
-            <p className="font-bold text-brand-cyan">{ticket.category}</p>
+            <p className="font-bold text-brand-pink">{ticket.category}</p>
           </div>
 
           <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 space-y-1">
-            <span className="text-gray-400 font-mono uppercase text-[10px]">Est. Budget</span>
-            <p className="font-bold text-amber-400">{ticket.estimatedBudget || 'N/A'}</p>
+            <span className="text-gray-400 font-mono uppercase text-[10px]">Budget</span>
+            <p className="font-bold text-emerald-400">{ticket.estimatedBudget || 'N/A'}</p>
           </div>
 
           <div className="p-3.5 rounded-xl bg-white/5 border border-white/5 space-y-1">
-            <span className="text-gray-400 font-mono uppercase text-[10px]">Target Start</span>
-            <p className="font-bold text-indigo-300">{ticket.startDate || 'Flexible'}</p>
+            <span className="text-gray-400 font-mono uppercase text-[10px]">Target Date</span>
+            <p className="font-bold text-white">{ticket.startDate || 'Immediate'}</p>
           </div>
         </div>
       </div>
 
-      {/* Message History Thread */}
-      <div className="space-y-6">
+      {/* Messages Thread Container */}
+      <div className="p-8 rounded-3xl bg-card border border-white/10 backdrop-blur-2xl shadow-2xl space-y-8">
         <h2 className="font-display text-xl font-bold text-white flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-brand-pink" />
-          Conversation Thread ({ticket.messages.length})
+          <MessageSquare className="w-5 h-5 text-brand-purple" /> Discussion Thread ({ticket.messages?.length || 0})
         </h2>
 
-        <div className="space-y-4">
-          {ticket.messages.map((msg: any) => (
+        <div className="space-y-6">
+          {ticket.messages?.map((msg: any) => (
             <div
               key={msg.id}
-              className={`p-6 rounded-2xl border backdrop-blur-xl space-y-3 transition-all ${
+              className={`p-6 rounded-2xl border transition-all ${
                 msg.isFromAdmin
-                  ? 'bg-gradient-to-r from-[#170e2b] to-[#0f0f17] border-brand-purple/50 shadow-glow'
-                  : 'bg-card border-white/10'
+                  ? 'bg-brand-purple/10 border-brand-purple/30 ml-4 sm:ml-8'
+                  : 'bg-white/5 border-white/10 mr-4 sm:mr-8'
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4 mb-3 pb-3 border-b border-white/5">
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
                       msg.isFromAdmin
-                        ? 'bg-brand-purple text-white'
+                        ? 'bg-gradient-to-tr from-brand-purple to-brand-pink text-white shadow-glow'
                         : 'bg-white/10 text-gray-300'
                     }`}
                   >
-                    {msg.isFromAdmin ? <Shield className="w-4 h-4 text-brand-pink" /> : <User className="w-4 h-4" />}
+                    {msg.isFromAdmin ? <Shield className="w-4 h-4" /> : <User className="w-4 h-4" />}
                   </div>
                   <div>
-                    <span className="text-xs font-bold text-white">
-                      {msg.senderName} {msg.isFromAdmin && <span className="text-brand-pink font-mono text-[10px] uppercase ml-1">(DarNed Official)</span>}
-                    </span>
-                    <span className="text-[11px] text-gray-400 block font-mono">{msg.senderEmail}</span>
+                    <span className="text-sm font-bold text-white block">{msg.senderName}</span>
+                    {msg.isFromAdmin && (
+                      <span className="text-[10px] font-mono font-bold text-brand-pink uppercase tracking-wider">
+                        DarNed Official Team
+                      </span>
+                    )}
                   </div>
                 </div>
-                <span className="text-[11px] font-mono text-gray-500">
-                  {formatDate(msg.createdAt)}
-                </span>
+                <span className="text-[11px] font-mono text-gray-400">{formatDate(msg.createdAt)}</span>
               </div>
 
-              <div className="text-xs text-gray-200 leading-relaxed whitespace-pre-wrap pt-2 border-t border-white/5">
+              <div className="text-xs leading-relaxed text-gray-200 whitespace-pre-wrap">
                 {msg.message}
               </div>
             </div>
           ))}
         </div>
+
+        {/* Reply Form */}
+        <form onSubmit={handleSendReply} className="pt-6 border-t border-white/10 space-y-4">
+          <label className="text-xs font-mono font-bold text-gray-300 uppercase block">
+            Post a Reply
+          </label>
+
+          <textarea
+            value={replyMessage}
+            onChange={(e) => setReplyMessage(e.target.value)}
+            rows={4}
+            placeholder="Type your reply message here..."
+            className="w-full p-4 rounded-2xl bg-black/50 border border-white/10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all resize-none"
+          />
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isSubmitting || !replyMessage.trim()}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-purple via-brand-pink to-brand-cyan text-white font-bold text-xs hover:opacity-95 transition-all shadow-glow flex items-center gap-2 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <span>Sending...</span>
+              ) : (
+                <>
+                  <span>Send Reply</span>
+                  <Send className="w-3.5 h-3.5" />
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
-
-      {/* Reply Form */}
-      {ticket.status !== 'CLOSED' ? (
-        <div className="p-6 rounded-3xl bg-card border border-white/10 backdrop-blur-2xl shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider font-mono">Send a Reply</h3>
-          <form onSubmit={handleSendReply} className="space-y-4">
-            <textarea
-              rows={4}
-              value={replyMessage}
-              onChange={(e) => setReplyMessage(e.target.value)}
-              placeholder="Type your response here..."
-              className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all"
-            />
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={isSubmitting || !replyMessage.trim()}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold text-xs hover:opacity-95 transition-all shadow-glow flex items-center gap-2 disabled:opacity-50"
-              >
-                {isSubmitting ? <span>Sending...</span> : <><Send className="w-4 h-4" /> Send Reply</>}
-              </button>
-            </div>
-          </form>
-        </div>
-      ) : (
-        <div className="p-4 rounded-xl bg-gray-500/10 border border-gray-500/20 text-center text-xs text-gray-400 font-mono">
-          This ticket has been marked as CLOSED. If you have further questions, please open a new inquiry.
-        </div>
-      )}
-
     </div>
   );
 }
